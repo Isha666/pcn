@@ -1,0 +1,82 @@
+
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+
+#define PORT 8080
+
+int main()
+{
+    int clientSocket;
+    struct sockaddr_in serverAddr;
+    socklen_t serverSize;
+
+    char rollNo[50];
+    char buffer[200];
+
+    // Create UDP socket
+    clientSocket = socket(AF_INET, SOCK_DGRAM, 0);
+
+    // Server address
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(PORT);
+    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+    serverSize = sizeof(serverAddr);
+
+    // NEW: Set 10-second receive timeout
+    struct timeval timer;
+    timer.tv_sec = 10;
+    timer.tv_usec = 0;
+
+    setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO,
+               &timer, sizeof(timer));
+
+    // Enter roll number
+    printf("Enter Roll Number: ");
+    scanf("%49s", rollNo);
+
+    // Send roll number
+    sendto(clientSocket,
+           rollNo,
+           strlen(rollNo) + 1,
+           0,
+           (struct sockaddr *)&serverAddr,
+           serverSize);
+
+    // Receive response
+    int n = recvfrom(clientSocket,
+                     buffer,
+                     sizeof(buffer) - 1,
+                     0,
+                     (struct sockaddr *)&serverAddr,
+                     &serverSize);
+
+    if (n < 0)
+    {
+        printf("Packet not received within 10 seconds! Timeout occurred.\n");
+        close(clientSocket);
+        return 0;
+    }
+
+    buffer[n] = '\0';
+
+    // Display result
+    if (strcmp(buffer, "Student Record Not Found") == 0 ||
+        strcmp(buffer, "File not found") == 0)
+    {
+        printf("%s\n", buffer);
+    }
+    else
+    {
+        printf("\nStudent Record:\n");
+        printf("%s\n", buffer);
+    }
+
+    close(clientSocket);
+
+    return 0;
+}
