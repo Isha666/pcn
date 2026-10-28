@@ -201,4 +201,16 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-is this code for exp9
+/*
+mon->SerializeToXmlFile("flow-results.xml"
+, true, true);
+ 1. Copy script into scratch directory
+cp my_script.cc scratch/my_script.cc
+# 2. Build the NS-3 project
+./ns3 build
+# 3. Run default simulation
+./ns3 run scratch/my_script
+# 4. Run with custom command-line arguments
+./ns3 run "scratch/my_script --bw=5Mbps --delay=20ms --q=100"
+# 5. Enable module logging during execution
+NS_LOG="UdpClient=level_info" ./ns3 run scratch/my_script*/
