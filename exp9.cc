@@ -213,4 +213,15 @@ cp my_script.cc scratch/my_script.cc
 # 4. Run with custom command-line arguments
 ./ns3 run "scratch/my_script --bw=5Mbps --delay=20ms --q=100"
 # 5. Enable module logging during execution
-NS_LOG="UdpClient=level_info" ./ns3 run scratch/my_script*/
+NS_LOG="UdpClient=level_info" ./ns3 run scratch/my_script
+
+#include <fstream>
+std::ofstream file("results.csv");
+
+file << "Flow,Throughput,Delay,Loss\n";
+file << flow.first << ","
+     << throughput << ","
+     << delay << ","
+     << loss << "\n";
+     file.close();
+     */
